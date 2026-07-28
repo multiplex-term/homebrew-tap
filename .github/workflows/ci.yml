@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bump-script:
+    name: bump script tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python3 -m unittest discover -s script -t script -v
+
+  formula:
+    name: brew style · audit
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Homebrew/actions/setup-homebrew@master
+      - name: style
+        run: brew style Formula/mpx.rb
+      - name: audit
+        run: |
+          # --online verifies every download URL actually resolves, which is
+          # what catches a bump pointing at a release that was never
+          # published. It can only work once the releases repo is public —
+          # until then those URLs 404 for an anonymous runner.
+          if curl -fsS -o /dev/null \
+              https://api.github.com/repos/multiplex-term/multiplex-cli-releases/releases/latest; then
+            brew audit --formula --online Formula/mpx.rb
+          else
+            echo "::notice::no public release yet — auditing offline"
+            brew audit --formula Formula/mpx.rb
+          fi
+
+  # A partial bump is the failure worth catching: some digests real, some still
+  # the placeholder means one platform installs nothing. All-placeholder is the
+  # legitimate state before the first release has ever run through here.
+  digests:
+    name: digests are all real or all placeholder
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          total=$(grep -c 'sha256 "' Formula/mpx.rb)
+          blank=$(grep -c 'sha256 "0\{64\}"' Formula/mpx.rb || true)
+          echo "$blank of $total digests are placeholders"
+          if [ "$blank" -eq 0 ]; then
+            echo "fully bumped"
+          elif [ "$blank" -eq "$total" ]; then
+            echo "::notice::no release published through this formula yet"
+          else
+            echo "::error::partial bump — $blank of $total platforms would install nothing"
+            exit 1
+          fi
