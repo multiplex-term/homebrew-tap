@@ -25,9 +25,14 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+      # Registers this checkout as the multiplex-term/tap tap — that is why
+      # the repository is named homebrew-tap: the action (and `brew install
+      # multiplex-term/tap/mpx` itself) resolve the tap to a repo with the
+      # homebrew- prefix, and only a registered tap can be audited, since
+      # `brew audit <path>` is disabled in current Homebrew.
       - uses: Homebrew/actions/setup-homebrew@master
       - name: style
-        run: brew style Formula/mpx.rb
+        run: brew style multiplex-term/tap/mpx
       - name: audit
         run: |
           # --online verifies every download URL actually resolves, which is
@@ -36,10 +41,10 @@ jobs:
           # until then those URLs 404 for an anonymous runner.
           if curl -fsS -o /dev/null \
               https://api.github.com/repos/multiplex-term/multiplex-cli-releases/releases/latest; then
-            brew audit --formula --online Formula/mpx.rb
+            brew audit --formula --online multiplex-term/tap/mpx
           else
             echo "::notice::no public release yet — auditing offline"
-            brew audit --formula Formula/mpx.rb
+            brew audit --formula multiplex-term/tap/mpx
           fi
 
   # A partial bump is the failure worth catching: some digests real, some still

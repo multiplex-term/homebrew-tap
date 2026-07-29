@@ -56,16 +56,17 @@ def parse_checksums(text: str, tag: str) -> dict[str, str]:
 
 def bump(formula: str, version: str, tag: str, digests: dict[str, str]) -> str:
     lines = formula.splitlines(keepends=True)
-    seen_version = False
     # Which target the most recent `url` line named, so the next `sha256`
     # knows which digest belongs to it.
     pending: str | None = None
     used: set[str] = set()
 
     for index, line in enumerate(lines):
-        if not seen_version and (match := VERSION_PATTERN.match(line)):
+        # The formula carries its version only in the URLs — brew scans it
+        # from them, and `brew audit` rejects a `version` directive it can
+        # scan. A leftover line is still updated when found, never required.
+        if match := VERSION_PATTERN.match(line):
             lines[index] = f"{match[1]}{version}{match[3]}\n"
-            seen_version = True
             continue
 
         if "url " in line and ".tar.gz" in line:
@@ -94,8 +95,6 @@ def bump(formula: str, version: str, tag: str, digests: dict[str, str]) -> str:
             used.add(pending)
             pending = None
 
-    if not seen_version:
-        raise BumpError('no `version "..."` line in the formula')
     # A platform in the release that the formula never mentions is a formula
     # that silently stopped shipping it — louder as an error than as a
     # download nobody notices is missing.

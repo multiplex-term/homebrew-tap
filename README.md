@@ -25,9 +25,14 @@ covers macOS and Linux, and installs the same archives.
 
 The formula ships **prebuilt binaries rather than a source build**: `mpx bind`
 is usually run on a server nobody wants a Rust toolchain on, and the source
-repository is private until the app ships. Builds come from
+repository is not public. Builds come from
 [`multiplex-cli-releases`](https://github.com/multiplex-term/multiplex-cli-releases),
-which exists to be the public half of a private source repo.
+which exists to be the public face of a closed source repo.
+
+(The repository is named `homebrew-tap` while the tap is `multiplex-term/tap`:
+that prefix is Homebrew's own convention — `brew install multiplex-term/tap/…`
+resolves to the `homebrew-tap` repo, and CI's setup-homebrew action uses the
+same rule to register the checkout as a tap.)
 
 ## Bumping
 
@@ -37,8 +42,10 @@ from the release's own `SHA256SUMS`, so a mismatch means the artifacts and the
 formula disagree — investigate rather than merge.
 
 Edit the formula's *shape* by hand freely (test block, dependencies, install
-layout). Never hand-edit `version` or a `sha256`: the next release overwrites
-both, so a manual change there is a change that silently disappears.
+layout). Never hand-edit a `url` or a `sha256`: the next release overwrites
+both, so a manual change there is a change that silently disappears. There is
+deliberately no `version` line — brew scans the version from the URLs, and
+`brew audit` rejects a directive it can scan.
 
 The bump is structural, not positional — each digest is matched to the `url`
 line naming its target triple — so reordering the platform blocks is safe. Run

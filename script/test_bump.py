@@ -28,14 +28,15 @@ def checksum_file(tag="v0.2.0", digests=None):
     )
 
 
-def formula(tag="v0.1.0", version="0.1.0"):
+def formula(tag="v0.1.0"):
+    # No `version` line, matching the real formula: the version lives only in
+    # the URLs, where brew scans it (`brew audit` rejects a redundant one).
     blocks = "\n".join(
         f'''    url "https://github.com/multiplex-term/multiplex-cli-releases/releases/download/{tag}/mpx-{tag}-{target}.tar.gz"
     sha256 "{"0" * 64}"'''
         for target in TARGETS
     )
     return f'''class Mpx < Formula
-  version "{version}"
 {blocks}
 end
 '''
@@ -75,11 +76,21 @@ class Bump(unittest.TestCase):
             target = next(t for t in TARGETS if f"-{t}.tar.gz" in line)
             self.assertIn(DIGESTS[target], lines[index + 1], f"{target} mispaired")
 
-    def test_rewrites_version_and_both_places_the_tag_appears(self):
+    def test_rewrites_both_places_the_tag_appears(self):
         result = bump(formula(), "0.2.0", "v0.2.0", DIGESTS)
-        self.assertIn('version "0.2.0"', result)
         self.assertNotIn("v0.1.0", result)
         self.assertIn("/download/v0.2.0/mpx-v0.2.0-aarch64-apple-darwin.tar.gz", result)
+        # And it must not add back the `version` directive brew audits away.
+        self.assertNotIn('version "', result)
+
+    def test_updates_a_leftover_version_line_without_requiring_one(self):
+        # The shipped formula has no `version` line, but one hand-added (or
+        # from an old checkout) must not survive a bump pointing elsewhere.
+        legacy = formula().replace(
+            "class Mpx < Formula\n", 'class Mpx < Formula\n  version "0.1.0"\n'
+        )
+        result = bump(legacy, "0.2.0", "v0.2.0", DIGESTS)
+        self.assertIn('version "0.2.0"', result)
 
     def test_survives_reordered_blocks(self):
         # Structural, not positional: the formula's platform order is a style
@@ -90,7 +101,7 @@ class Bump(unittest.TestCase):
     sha256 "{"0" * 64}"'''
             for t in reversed_targets
         )
-        source = f'class Mpx < Formula\n  version "0.1.0"\n{blocks}\nend\n'
+        source = f"class Mpx < Formula\n{blocks}\nend\n"
         result = bump(source, "0.2.0", "v0.2.0", DIGESTS)
         lines = result.splitlines()
         for index, line in enumerate(lines):
@@ -117,10 +128,6 @@ class Bump(unittest.TestCase):
         with self.assertRaises(BumpError) as caught:
             bump(formula(), "0.2.0", "v0.2.0", partial)
         self.assertIn("x86_64-apple-darwin", str(caught.exception))
-
-    def test_refuses_a_formula_with_no_version(self):
-        with self.assertRaises(BumpError):
-            bump('class Mpx < Formula\nend\n', "0.2.0", "v0.2.0", {})
 
     def test_is_idempotent(self):
         once = bump(formula(), "0.2.0", "v0.2.0", DIGESTS)
