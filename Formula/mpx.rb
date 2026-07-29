@@ -14,22 +14,22 @@ class Mpx < Formula
   on_macos do
     on_arm do
       url "https://github.com/multiplex-term/multiplex-cli-releases/releases/download/v0.1.0/mpx-v0.1.0-aarch64-apple-darwin.tar.gz"
-      sha256 "0000000000000000000000000000000000000000000000000000000000000000"
+      sha256 "84ebcc358fd3840cb55ac6c0493a2356379f60416aa15dd5135bf516c2f56c60"
     end
     on_intel do
       url "https://github.com/multiplex-term/multiplex-cli-releases/releases/download/v0.1.0/mpx-v0.1.0-x86_64-apple-darwin.tar.gz"
-      sha256 "0000000000000000000000000000000000000000000000000000000000000000"
+      sha256 "942659fb1279e96d02f53292b8ec81ceb53907a70b6ac85162f5367dc02dee0b"
     end
   end
 
   on_linux do
     on_arm do
       url "https://github.com/multiplex-term/multiplex-cli-releases/releases/download/v0.1.0/mpx-v0.1.0-aarch64-unknown-linux-musl.tar.gz"
-      sha256 "0000000000000000000000000000000000000000000000000000000000000000"
+      sha256 "326eb88235d823cb85687df5190622c50dbfc3e09a158e5bad6a25608c69f6a4"
     end
     on_intel do
       url "https://github.com/multiplex-term/multiplex-cli-releases/releases/download/v0.1.0/mpx-v0.1.0-x86_64-unknown-linux-musl.tar.gz"
-      sha256 "0000000000000000000000000000000000000000000000000000000000000000"
+      sha256 "b55f23d01d1fb753e213324ffbefb0dea3ab2c70fb15859c38bedff35ce1f155"
     end
   end
 
