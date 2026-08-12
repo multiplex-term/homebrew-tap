@@ -13,23 +13,23 @@ class Mpx < Formula
   # source repository is not public.
   on_macos do
     on_arm do
-      url "https://github.com/multiplex-term/multiplex-cli-releases/releases/download/v0.1.1/mpx-v0.1.1-aarch64-apple-darwin.tar.gz"
-      sha256 "c7198cd0d8e780078cb829eeb119fb4260e63e3899c56841f8a2c04a9715b588"
+      url "https://github.com/multiplex-term/multiplex-cli-releases/releases/download/v0.1.2/mpx-v0.1.2-aarch64-apple-darwin.tar.gz"
+      sha256 "a1b307e1abd7e768b3e72173b48a9fc184a258da95af68218ab8f0695f529c05"
     end
     on_intel do
-      url "https://github.com/multiplex-term/multiplex-cli-releases/releases/download/v0.1.1/mpx-v0.1.1-x86_64-apple-darwin.tar.gz"
-      sha256 "c38255c799dade29196bae1505fb084a357ea995c440f30693aab03c5780e73b"
+      url "https://github.com/multiplex-term/multiplex-cli-releases/releases/download/v0.1.2/mpx-v0.1.2-x86_64-apple-darwin.tar.gz"
+      sha256 "11344d15f463a537587007a7adf1bd31f51dfc52db59cd20e7520a7d38a21c5d"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/multiplex-term/multiplex-cli-releases/releases/download/v0.1.1/mpx-v0.1.1-aarch64-unknown-linux-musl.tar.gz"
-      sha256 "7c1e1471647bf1a305bc08043cd8b1f8cab370a2dde0f5995edf0ffd850afacb"
+      url "https://github.com/multiplex-term/multiplex-cli-releases/releases/download/v0.1.2/mpx-v0.1.2-aarch64-unknown-linux-musl.tar.gz"
+      sha256 "846384bd51065819ad20aab8cd126e0d016e2e78c5e07ba6a2faf88445483368"
     end
     on_intel do
-      url "https://github.com/multiplex-term/multiplex-cli-releases/releases/download/v0.1.1/mpx-v0.1.1-x86_64-unknown-linux-musl.tar.gz"
-      sha256 "ef753499b2f135bc654a7f8d7f04680e1179114e4db8cf88dad5cae1b8afee77"
+      url "https://github.com/multiplex-term/multiplex-cli-releases/releases/download/v0.1.2/mpx-v0.1.2-x86_64-unknown-linux-musl.tar.gz"
+      sha256 "2949c98b94ebd44604b844ae83d57861f1645c31ecb185581e98786627fc0784"
     end
   end
 
