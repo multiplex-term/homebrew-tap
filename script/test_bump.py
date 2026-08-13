@@ -32,7 +32,7 @@ def formula(tag="v0.1.0"):
     # No `version` line, matching the real formula: the version lives only in
     # the URLs, where brew scans it (`brew audit` rejects a redundant one).
     blocks = "\n".join(
-        f'''    url "https://github.com/multiplex-term/multiplex-cli-releases/releases/download/{tag}/mpx-{tag}-{target}.tar.gz"
+        f'''    url "https://github.com/multiplex-term/mpx-cli/releases/download/{tag}/mpx-{tag}-{target}.tar.gz"
     sha256 "{"0" * 64}"'''
         for target in TARGETS
     )
@@ -110,11 +110,21 @@ class Bump(unittest.TestCase):
             target = next(t for t in TARGETS if f"-{t}.tar.gz" in line)
             self.assertIn(DIGESTS[target], lines[index + 1])
 
+    def test_reads_the_filename_not_the_repo_path(self):
+        # The releases moved to `multiplex-term/mpx-cli`, so `mpx-` now appears
+        # in the URL *before* the archive name. Matching there reads a target
+        # triple of `v0.2.0-aarch64-apple-darwin` — which no SHA256SUMS lists,
+        # so every bump fails until someone works out why.
+        result = bump(formula(), "0.2.0", "v0.2.0", DIGESTS)
+        self.assertIn("github.com/multiplex-term/mpx-cli/releases/download/", result)
+        for target in TARGETS:
+            self.assertIn(f"/mpx-v0.2.0-{target}.tar.gz", result)
+
     def test_refuses_a_platform_the_formula_forgot(self):
         # A release that ships four archives against a formula naming three
         # means one platform silently stopped being installable.
         trimmed = formula().replace(
-            f'''    url "https://github.com/multiplex-term/multiplex-cli-releases/releases/download/v0.1.0/mpx-v0.1.0-x86_64-unknown-linux-musl.tar.gz"
+            f'''    url "https://github.com/multiplex-term/mpx-cli/releases/download/v0.1.0/mpx-v0.1.0-x86_64-unknown-linux-musl.tar.gz"
     sha256 "{"0" * 64}"
 ''',
             "",

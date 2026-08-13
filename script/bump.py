@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Point Formula/mpx.rb at a new mpx release.
 
-Called by multiplex-cli's release workflow with that release's SHA256SUMS.
+Called by mpx-cli's release workflow with that release's SHA256SUMS.
 It lives here, next to the formula, because the formula is what every
 `brew install multiplex-term/tap/mpx` resolves: the code that rewrites it
 deserves tests (see script/test_bump.py) rather than being regexes buried in
@@ -72,10 +72,16 @@ def bump(formula: str, version: str, tag: str, digests: dict[str, str]) -> str:
         if "url " in line and ".tar.gz" in line:
             # The old tag appears in both the release path and the filename.
             lines[index] = re.sub(r"/download/v[^/]+/", f"/download/{tag}/", line)
+            # Both patterns read one path segment — no `/` inside the match —
+            # so they land on the archive's filename rather than on the first
+            # `mpx-` anywhere in the URL. The releases now live at
+            # `multiplex-term/mpx-cli`, and a pattern that can cross `/`
+            # starts in that repo path instead and walks out with a "target
+            # triple" of `v0.2.0-aarch64-apple-darwin`.
             lines[index] = re.sub(
-                r"mpx-v[^-]+-(.+)\.tar\.gz", rf"mpx-{tag}-\1.tar.gz", lines[index]
+                r"/mpx-v[^-/]+-([^/]+)\.tar\.gz", rf"/mpx-{tag}-\1.tar.gz", lines[index]
             )
-            target = re.search(r"mpx-[^-]+-(.+)\.tar\.gz", lines[index])
+            target = re.search(r"/mpx-[^-/]+-([^/]+)\.tar\.gz", lines[index])
             if not target:
                 raise BumpError(f"could not read a target triple from: {line.strip()!r}")
             pending = target[1]
