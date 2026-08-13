@@ -34,18 +34,13 @@ jobs:
       - name: style
         run: brew style multiplex-term/tap/mpx
       - name: audit
-        run: |
-          # --online verifies every download URL actually resolves, which is
-          # what catches a bump pointing at a release that was never
-          # published. It can only work once the releases repo is public —
-          # until then those URLs 404 for an anonymous runner.
-          if curl -fsS -o /dev/null \
-              https://api.github.com/repos/multiplex-term/multiplex-cli-releases/releases/latest; then
-            brew audit --formula --online multiplex-term/tap/mpx
-          else
-            echo "::notice::no public release yet — auditing offline"
-            brew audit --formula multiplex-term/tap/mpx
-          fi
+        # --online verifies every download URL actually resolves, which is what
+        # catches a bump pointing at a release that was never published. It used
+        # to run behind a check that a public release existed at all, because
+        # mpx's downloads lived in a separate repo while the source was closed;
+        # they come from the public `mpx-cli` now, so the URLs always resolve
+        # for an anonymous runner and the audit is unconditional.
+        run: brew audit --formula --online multiplex-term/tap/mpx
 
   # A partial bump is the failure worth catching: some digests real, some still
   # the placeholder means one platform installs nothing. All-placeholder is the

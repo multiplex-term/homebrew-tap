@@ -24,10 +24,12 @@ covers macOS and Linux, and installs the same archives.
 | `script/test_bump.py` | Tests for the above |
 
 The formula ships **prebuilt binaries rather than a source build**: `mpx bind`
-is usually run on a server nobody wants a Rust toolchain on, and the source
-repository is not public. Builds come from
-[`multiplex-cli-releases`](https://github.com/multiplex-term/multiplex-cli-releases),
-which exists to be the public face of a closed source repo.
+is usually run on a server nobody wants a Rust toolchain on. Builds come from
+[`mpx-cli`](https://github.com/multiplex-term/mpx-cli/releases), the CLI's own
+repository. Releases up to v0.1.2 were published to
+[`multiplex-cli-releases`](https://github.com/multiplex-term/multiplex-cli-releases)
+while that source was closed; they are mirrored under the new URLs, so the
+digests below did not change when the formula moved.
 
 (The repository is named `homebrew-tap` while the tap is `multiplex-term/tap`:
 that prefix is Homebrew's own convention — `brew install multiplex-term/tap/…`
@@ -36,7 +38,7 @@ same rule to register the checkout as a tap.)
 
 ## Bumping
 
-Don't. `multiplex-cli`'s release workflow runs `script/bump.py` on every tag
+Don't. `mpx-cli`'s release workflow runs `script/bump.py` on every tag
 and opens a PR here; merging it is the whole job. The digests in that PR come
 from the release's own `SHA256SUMS`, so a mismatch means the artifacts and the
 formula disagree — investigate rather than merge.
